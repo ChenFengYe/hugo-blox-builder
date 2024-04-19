@@ -21,6 +21,7 @@ $sta-primary-dark: darken($sta-primary, $sta-darken-percentage);
 $sta-link: {{ $scr.Get "link" }};
 $sta-link-hover: {{ $scr.Get "link_hover" }};
 $sta-link-decoration: {{ $scr.Get "link_decoration" }};
+$sta-link-highlight-name: {{ $scr.Get "link_highlight_name" }};
 
 $sta-dark-link: {{ $scr.Get "dark_link" }};
 $sta-dark-link-hover: {{ $scr.Get "dark_link_hover" }};

@@ -71,6 +71,7 @@
 {{- $scr.Set "link" ($theme_day.link | default $theme_day.primary | default ($scr.Get "primary")) -}}
 {{- $scr.Set "link_hover" ($theme_day.link_hover | default $theme_day.primary | default ($scr.Get "primary")) -}}
 {{- $scr.Set "link_decoration" ($theme_day.link_decoration | default "inherit") -}}
+{{- $scr.Set "link_highlight_name" ($theme_day.link | default $theme_day.primary | default ($scr.Get "primary")) -}}
 
 {{- $scr.Set "dark_link" ($theme_night.link | default $theme_night.primary | default ($scr.Get "primary")) -}}
 {{- $scr.Set "dark_link_hover" ($theme_night.link_hover | default $theme_night.primary | default ($scr.Get "primary")) -}}

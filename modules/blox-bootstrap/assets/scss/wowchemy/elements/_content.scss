@@ -153,6 +153,8 @@
 
   .author-highlighted {
     font-weight: bold;
+    text-decoration: underline;
+    color: $sta-link-highlight-name;
   }
 }
 

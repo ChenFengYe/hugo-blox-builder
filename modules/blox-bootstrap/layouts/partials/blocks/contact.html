@@ -25,8 +25,8 @@
 
 <div class="col-12 {{if eq $columns "2"}}col-lg-8{{end}}">
   {{ with $block.content.text }}<p>{{ . | emojify | $page.RenderString }}</p>{{ end }}
-
-  {{ if $use_form }}
+  
+  <!-- {{ if $use_form }}
 
     {{ $post_action := "" }}
     {{ if $use_netlify_form }}
@@ -73,7 +73,7 @@
         <button type="submit" class="btn btn-primary px-3 py-2 w-100">{{ i18n "contact_send" | default "Send" }}</button>
       </form>
     </div>
-  {{ end }}
+  {{ end }} -->
 
   <ul class="fa-ul">
 
@@ -151,19 +151,30 @@
       <a href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }}>{{.name|markdownify|emojify|safeHTML}}</a>
     </li>
     {{ end }}
-
   </ul>
 
-  {{ if and site.Params.features.map.provider $data.coordinates.latitude }}
-  <div class="d-none">
-    <input id="map-provider" value="{{ lower site.Params.features.map.provider }}">
-    <input id="map-lat" value="{{ $data.coordinates.latitude }}">
-    <input id="map-lng" value="{{ $data.coordinates.longitude }}">
-    <input id="map-dir" value="{{ $addr_formatted }}">
-    <input id="map-zoom" value="{{ site.Params.features.map.zoom | default "15" }}">
-    <input id="map-api-key" value="{{ site.Params.features.map.api_key }}">
+<!-- Wrapper container for flex display with specific dimensions -->
+<div style="display: flex; width: 800px; height: 100px;">
+
+  <!-- Container for the map input and display with specific size ratio -->
+  <div style="flex: 0 0 400px; height: 201px;"> <!-- Width is double the height -->
+    {{ if and site.Params.features.map.provider $data.coordinates.latitude }}
+    <div class="d-none">
+      <input id="map-provider" value="{{ lower site.Params.features.map.provider }}">
+      <input id="map-lat" value="{{ $data.coordinates.latitude }}">
+      <input id="map-lng" value="{{ $data.coordinates.longitude }}">
+      <input id="map-dir" value="{{ $addr_formatted }}">
+      <input id="map-zoom" value="{{ site.Params.features.map.zoom | default "15" }}">
+      <input id="map-api-key" value="{{ site.Params.features.map.api_key }}">
+    </div>
+    <div id="map" style="width: 100%; height: 100%;"></div> <!-- Ensure map fills the container -->
+    {{ end }}
   </div>
-  <div id="map"></div>
-  {{ end }}
+
+
+  <!-- Container for the ClustrMaps script, moved to the right -->
+  <div style="flex: 1; padding-left: 5px;"> <!-- Changed padding to left for spacing when switched -->
+    <script type='text/javascript' id='clustrmaps' src='//cdn.clustrmaps.com/map_v2.js?cl=ffffff&w=375&t=tt&d=O8RXzIRuaS2aZrhlSVF9Mo3sC3cJziACrnPJbcG9mF4&co=999999&ct=ffffff'></script>
+  </div>
 
 </div>

@@ -13,11 +13,23 @@
   {{ end }}
   {{ end }}
 
+  {{ if and (eq $is_list 1) (eq $page.Type "publication") }}
+  <span class="pub-publication">
+    {{ if and ($page.Params.publication) ($page.Params.publication_short) }}
+      {{ $page.Params.publication | markdownify }}
+      (<strong>{{ $page.Params.publication_short | markdownify }}</strong>)
+    {{ else if $page.Params.publication_short }}
+      <strong>{{ $page.Params.publication_short | markdownify }}</strong>
+    {{ end }}
+  </span>
+  {{ end }}
+
   {{ if not (in (slice "event" "page") $page.Type) | and (ne $page.Params.show_date false) }}
+  <span class="middot-divider"></span>
   <span class="article-date">
     {{ $date := $page.Lastmod | time.Format site.Params.locale.date_format }}
     {{ if eq $page.Type "publication" }}
-      {{ $date = $page.Date | time.Format (site.Params.publications.date_format | default "January, 2006") }}
+      {{ $date = $page.Date | time.Format (site.Params.publications.date_format | default "January 2006") }}
     {{ else }}
       {{ if ne $page.Params.Lastmod $page.Params.Date }}
           {{ i18n "last_updated" }}
@@ -27,16 +39,6 @@
   </span>
   {{ end }}
 
-  {{ if and (eq $is_list 1) (eq $page.Type "publication") }}
-  <span class="middot-divider"></span>
-  <span class="pub-publication">
-    {{ if $page.Params.publication_short }}
-      {{ $page.Params.publication_short | markdownify }}
-    {{ else if $page.Params.publication }}
-      {{ $page.Params.publication | markdownify }}
-    {{ end }}
-  </span>
-  {{ end }}
 
   {{ if and (eq $page.Type "post") (not (or (eq site.Params.reading_time false) (eq $page.Params.reading_time false))) }}
   <span class="middot-divider"></span>

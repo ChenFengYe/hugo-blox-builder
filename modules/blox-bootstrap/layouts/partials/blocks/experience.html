@@ -37,16 +37,24 @@
         <div class="card-body">
 
           {{- if .company_logo}}
-          {{- $svg_icon := resources.Get (printf "media/icons/brands/%s.svg" .company_logo) -}}
-          {{ if not $svg_icon }}{{ errorf "Brand logo not found at `assets/media/icons/brands/%s.svg`" .company_logo }}{{end}}
+          {{- $logoBasePath := printf "media/icons/brands/%s" .company_logo -}}
+          {{- $svgIcon := resources.Get (printf "%s.svg" $logoBasePath) -}}
+          {{- $pngIcon := resources.Get (printf "%s.png" $logoBasePath) -}}
+          {{- $jpgIcon := resources.Get (printf "%s.jpg" $logoBasePath) -}}
+          {{- $icon := or (and $svgIcon $svgIcon.RelPermalink) (or (and $pngIcon $pngIcon.RelPermalink) (and $jpgIcon $jpgIcon.RelPermalink)) -}}
           <div class="d-flex align-content-start">
             <div class="mr-2 mb-2">
               {{- with .company_url}}<a href="{{.}}" target="_blank" rel="noopener">{{end -}}
-              <img src="{{ $svg_icon.RelPermalink }}" width="56" height="56" alt="{{.company | plainify}}" loading="lazy">
+              {{- if $icon}}
+                <img src="{{ $icon }}" style="height: 56px; width: auto;" alt="{{ .company | plainify }}" loading="lazy">
+              {{- else}}
+                <img src="/path/to/default/logo.png" width="56" height="56" alt="Default Logo" loading="lazy">
+              {{- end}}
               {{- with .company_url}}</a>{{end -}}
             </div>
             <div>
-          {{ end }}
+        {{ end }}
+       
 
               <div class="section-subheading card-title exp-title text-muted my-0">{{.title | markdownify | emojify}}</div>
               <div class="section-subheading card-title exp-company text-muted my-0">

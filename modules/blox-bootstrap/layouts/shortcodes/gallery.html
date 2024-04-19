@@ -1,60 +1,124 @@
-{{/* Gallery Shortcode for Hugo Blox Builder. */}}
-{{/* Load gallery images from media library. */}}
-{{/* https://github.com/HugoBlox/hugo-blox-builder */}}
+<style>
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 2fr); /* 6 columns */
+    grid-auto-rows: minmax(150px, auto); /* Auto row height */
+    gap: 10px;
+  }
 
-{{/*
-    Docs: https://docs.hugoblox.com/content/writing-markdown-latex/#image-gallery
+  .grid-item--tall {
+    grid-column: span 1;
+    grid-row: span 2;
+  }
 
-    Parameters
-    ----------
-    album : default "gallery"
-        Album folder in `assets/media/albums/` to load images from.
-    order : default "asc"
-        Sort images by title ascending (asc) or descending (desc).
-    resize_options : default "750x750"
-        Resize options passed to Hugo `.Fit` function (https://gohugo.io/content-management/image-processing/).
-*/}}
+  .grid-item--wide {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
 
-{{/* For gallery nested in landing page sections */}}
+  .gallery-item--video {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    object-fit: scale-down; /* Fit video size but do not clip */
+    background-color: rgb(202, 202, 202); /* Light grey background color */
+  }
+
+  .gallery-item {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .hover-text {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    transition: opacity 0.3s;
+    opacity: 0;
+  }
+
+  .gallery-item:hover .hover-text {
+    display: block;
+    opacity: 1;
+  }
+</style>
+
+<script>
+// document.addEventListener('DOMContentLoaded', function() {
+//   const galleryItems = document.querySelectorAll('.gallery-item');
+//   galleryItems.forEach(item => {
+//     let mediaLink = item.querySelector('a').getAttribute('href');
+//     let lastDotIndex = mediaLink.lastIndexOf('.');
+//     if (lastDotIndex === -1) return; // 如果没有找到点号，跳过处理
+    
+//     // let txtFile = mediaLink.replace('.jpg'/\.(jpg|png|mp4)$/, '.txt');
+
+//     // let txtFile = mediaLink.slice(0, lastDotIndex) + '.txt';
+//     // console.log("Trying to fetch text from:", txtFile); // 打印正在尝试获取的文件地址
+
+//     // item.querySelector('.hover-text').textContent = "aaa aaa";
+//     // item.querySelector('.hover-text').style.display = 'block'; // 显示文本
+//     fetch(txtFile)
+//       .then(response => {
+//         if (response.ok) {
+//           return response.text();
+//         } else {
+//           throw new Error('Text file does not exist or cannot be accessed');
+//         }
+//       })
+//       .then(text => {
+//         if (text.trim() !== '') { // 确保文本不为空
+//           item.querySelector('.hover-text').textContent = text;
+//           item.querySelector('.hover-text').style.display = 'block'; // 显示文本
+//         } else {
+//           throw new Error('Text file is empty');
+//         }
+//       })
+//       .catch(error => {
+//         console.error(error.message); // 控制台打印错误信息
+//         item.querySelector('.hover-text').style.display = 'none'; // 确保文本区域不显示
+//       });
+//   });
+// });
+</script>
+
 {{ $.Page.Store.Set "has_gallery" true }}
-
-{{/* Get album folder or default to `media/albums/gallery/`. */}}
-{{ $album := (.Get "album") | default "gallery" }}
-{{ $album_path := path.Join "media" "albums" $album "*" }}
-
-{{/* Gallery options */}}
-{{ $sort_order := .Get "order" | default "asc" }}
-{{ $resize_options := printf "%s webp" (.Get "resize_options" | default "750x750") }}
+{{ $album := default "gallery" (.Get "album") }}
+{{ $album_path := print "media/albums/" $album "/" }}
+{{ $sort_order := default "asc" (.Get "order") }}
+{{ $resize_options := printf "%s webp" (default "750x750" (.Get "resize_options")) }}
 
 <div class="gallery-grid">
-
-  {{/* Attempt to automatically load gallery images from page bundle */}}
-  {{ $images := resources.Match $album_path }}
-  {{ range (sort $images "Name" $sort_order) }}
-    {{ $image := .Fit $resize_options }}
-    {{/* Check if the user set a caption for this image */}}
-    {{ $filename := path.Base .Name }}
-    {{ $caption := "" }}
-    {{ if $.Page.Params.gallery_item }}
-      {{ range (where (where $.Page.Params.gallery_item "album" $album) "image" $filename) }}
-        {{ $caption = .caption }}
+  {{ $resources := resources.Match (print $album_path "*") }}
+  {{ range sort $resources "Name" $sort_order }}
+    {{ if strings.HasSuffix .Name ".mp4" }}
+      <div class="gallery-item gallery-item--video">
+        <a data-fancybox="gallery-{{$album}}" href="{{ .RelPermalink }}">
+          <video src="{{ .RelPermalink }}" autoplay loop muted loading="lazy">
+            Your browser does not support the video tag.
+          </video>
+          <!-- <div class="hover-text">Text placeholder</div> -->
+        </a>
+      </div>
+    {{ else if or (strings.HasSuffix .Name ".jpg") (strings.HasSuffix .Name ".png") }}
+      {{ $image := .Fit $resize_options }}
+      {{ $ratio := div (float $image.Width) (float $image.Height) }}
+      {{ $grid_size := "grid-item--tall" }}
+      {{ if gt $ratio 1.0 }}
+        {{ $grid_size = "grid-item--wide" }}
       {{ end }}
+      <div class="gallery-item {{ $grid_size }}">
+        <a data-fancybox="gallery-{{$album}}" href="{{ $image.RelPermalink }}">
+          <img src="{{ $image.RelPermalink }}" loading="lazy" alt="{{ plainify .Name }}" width="100%">
+          <!-- <div class="hover-text">Text placeholder</div> -->
+        </a>
+      </div>
     {{ end }}
-  {{ $image_size := "gallery-item--medium" }}
-  {{if in .Name "-f." }}
-    {{ $image_size = "gallery-item--full" }}
-  {{else if in .Name "-s." }}
-    {{ $image_size = "" }}
-  {{else if in .Name "-l." }}
-    {{ $image_size = "gallery-item--large" }}
-  {{end}}
-  <div class="gallery-item {{$image_size}}">
-    <a data-fancybox="gallery-{{$album}}" href="{{ .RelPermalink }}" {{ with $caption }}data-caption="{{.|markdownify|emojify|safeHTMLAttr}}"{{ end }}>
-      <img src="{{ $image.RelPermalink }}" loading="lazy" alt="{{ plainify $caption | default $filename }}" width="{{ $image.Width }}" height="{{ $image.Height }}">
-    </a>
-  </div>
-  {{else}}
-    {{ errorf "Unable to load gallery `%s` in `%s`." $album_path .Page.File.Filename }}
-  {{end}}
-
+  {{ end }}
 </div>

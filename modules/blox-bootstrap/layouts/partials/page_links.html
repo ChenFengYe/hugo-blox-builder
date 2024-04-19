@@ -29,13 +29,6 @@
   {{ i18n "btn_pdf" }}
 </a>
 {{ end }}
-{{ $resource := $page.Resources.GetMatch "cite.bib" }}
-{{ with $resource }}
-<a href="#" class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}} js-cite-modal"
-        data-filename="{{ .RelPermalink }}">
-  {{ i18n "btn_cite" }}
-</a>
-{{ end }}
 {{ with $page.Params.url_code }}
   {{ $resource := $page.Resources.GetMatch . }}
   {{ if $resource }}
@@ -155,4 +148,34 @@
     {{ if .icon }}<i class="{{ $pack }} {{ $pack_prefix }}-{{ .icon }} {{if .name}}mr-1{{end}}"></i>{{end}}
     {{- with .name }}{{ . | safeHTML }}{{ end -}}
   </a>
+{{ end }}
+{{ $resource := $page.Resources.GetMatch "cite.bib" }}
+{{ with $resource }}
+<a href="#" class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}} js-cite-modal"
+        data-filename="{{ .RelPermalink }}">
+  {{ i18n "btn_cite" }}
+</a>
+{{ end }}
+
+{{/* Assuming $page.Params.url_code is your GitHub URL */}}
+{{ if $page.Params.show_github_stars }}
+{{ $url := $page.Params.url_code }}
+{{ $parts := split $url "github.com/" }}
+{{ if gt (len $parts) 1 }}
+    {{ $repoPart := index $parts 1 }}
+    {{ $repoParts := split $repoPart "/" }}
+    {{ if ge (len $repoParts) 2 }}
+        {{ $repoPath := printf "%s/%s" (index $repoParts 0) (index $repoParts 1) }}
+        <!-- Use $repoPath for the GitHub stars image URL -->
+        <a href="{{ $url }}" style="padding: 1.2px;" class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{ end }} js-cite-modal" target="_blank">
+            <img alt="GitHub stars" style="vertical-align: middle;" src="https://img.shields.io/github/stars/{{$repoPath}}?style=social">
+        </a>
+    {{ else }}
+        <!-- Handle the error if the GitHub URL doesn't contain at least two parts after 'github.com/' -->
+        <div>Error: Invalid GitHub URL provided.</div>
+    {{ end }}
+{{ else }}
+    <!-- Handle the error if the URL does not contain 'github.com/' -->
+    <div>Error: URL does not contain a valid GitHub repository.</div>
+{{ end }}
 {{ end }}

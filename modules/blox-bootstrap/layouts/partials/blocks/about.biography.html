@@ -22,6 +22,51 @@
 {{ $avatar := ($person_page.Resources.ByType "image").GetMatch "*avatar*" }}
 {{ $avatar_shape := site.Params.features.avatar.shape | default "circle" }}
 
+<style>
+  .news-list li {
+      display: none;
+  }
+  .news-list li:nth-child(-n+6) {
+      display: list-item;
+  }
+  /* 按钮的基本样式 */
+.toggle-button {
+    display: block; /* 将按钮显示为块级元素 */
+    width: 60px; /* 定义按钮的宽度 */
+    margin-left: 18px; /* 上下边距20px, 自动水平居中 */
+    padding: 00px 0; /* 垂直内边距10px, 水平无内边距 */
+    font-size: 16px; /* 文字大小 */
+    border: none; /* 无边框 */
+    border-radius: 5px; /* 边框圆角 */
+    cursor: pointer; /* 鼠标悬停时显示指针 */
+    transition: background-color 0.3s; /* 背景颜色过渡效果 */
+}
+
+/* 按钮悬停效果 */
+.toggle-button:hover {
+    background-color: #b5b5b5; /* 按钮悬停时的背景颜色 */
+}
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      var toggleButton = document.querySelector('.toggle-button');
+      var newsList = document.querySelector('.news-list');
+      var expanded = false;
+  
+      toggleButton.addEventListener('click', function() {
+          expanded = !expanded;
+          if (expanded) {
+              toggleButton.textContent = 'Hide';
+              newsList.querySelectorAll('li').forEach(li => li.style.display = 'list-item');
+          } else {
+              toggleButton.textContent = 'More';
+              newsList.querySelectorAll('li').forEach((li, idx) => li.style.display = idx < 6 ? 'list-item' : 'none');
+          }
+      });
+  });
+  </script>
+  
 <!-- About widget -->
 <div class="row">
   <div class="col-12 col-lg-4">
@@ -120,8 +165,8 @@
           <li>
             <i class="fa-li fa-solid fa-graduation-cap"></i>
             <div class="description">
-              <p class="course">{{ .course }}{{ with .year }}, {{ . }}{{ end }}</p>
               <p class="institution">{{ .institution }}</p>
+              <p class="course">{{ .course }}{{ with .year }}, {{ . }}{{ end }}</p>       
             </div>
           </li>
           {{ end }}
@@ -129,6 +174,36 @@
       </div>
       {{ end }}
 
+
+      {{ with $person.news }}
+      <div class="col-md-12">
+          <div class="section-subheading">{{ i18n "news" | markdownify }}</div>
+          <ul class="ul-interests fa-ul mb-0 news-list">
+              {{ range . }}
+              <li>
+                  <i class="fa-li fa-solid fa-rss"></i>
+                  {{ . | markdownify | emojify }}
+              </li>
+              {{ end }}
+          </ul>
+          <button class="toggle-button">More</button>
+      </div>
+      {{ end }}
+      
+      {{ with $person.service }}
+      <div class="col-md-12">
+        <div class="section-subheading">{{ i18n "service" | markdownify }}</div>
+        <ul class="ul-interests fa-ul mb-0">
+          {{ range . }}
+          <li>
+            <i class="fa-li fa-solid fa-book"></i>
+            {{ . | markdownify | emojify }}
+          </li>
+          {{ end }}
+        </ul>
+      </div>
+      {{ end }}      
     </div>
   </div>
 </div>
+
