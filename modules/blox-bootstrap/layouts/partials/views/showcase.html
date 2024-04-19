@@ -72,7 +72,7 @@
 
     <div class="col-12 col-md-3 pr-0 order-first {{$order}}">
       {{/* First, attempt to fetch the featured video */}}
-      {{ $video_resource := partial "blox-bootstrap/functions/get_featured_video.html" $item }}
+      {{ $video_resource := partial "blox-core/functions/get_featured_video.html" $item }}
       {{ with $video_resource }}
         {{/* If a video is found, render the video here */}}
         <video width="540" height="auto" autoplay loop muted>
