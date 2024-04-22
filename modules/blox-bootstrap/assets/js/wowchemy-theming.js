@@ -44,17 +44,19 @@ function initThemeVariation() {
       isDarkTheme = true;
       break;
     default:
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        // The visitor prefers dark themes and switching to the dark variation is allowed by admin.
-        isDarkTheme = true;
-      } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-        // The visitor prefers light themes and switching to the light variation is allowed by admin.
-        isDarkTheme = false;
-      } else {
-        // Use the site's default theme variation based on `light` in the theme file.
-        isDarkTheme = window.wc.isSiteThemeDark;
-      }
+      isDarkTheme = false;
       break;
+      // if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      //   // The visitor prefers dark themes and switching to the dark variation is allowed by admin.
+      //   isDarkTheme = true;
+      // } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+      //   // The visitor prefers light themes and switching to the light variation is allowed by admin.
+      //   isDarkTheme = false;
+      // } else {
+      //   // Use the site's default theme variation based on `light` in the theme file.
+      //   isDarkTheme = window.wc.isSiteThemeDark;
+      // }
+      // break;
   }
 
   if (isDarkTheme && !body.classList.contains('dark')) {
