@@ -37,7 +37,10 @@
           <!-- Logo Section -->
           {{- if .company_logo}}
           {{- $logoBasePath := printf "media/icons/brands/%s" .company_logo -}}
-          {{- $icon := resources.GetMatch (printf "%s.{svg,png,jpg}" $logoBasePath) | relURL -}}
+          {{- $svgIcon := resources.Get (printf "%s.svg" $logoBasePath) -}}
+          {{- $pngIcon := resources.Get (printf "%s.png" $logoBasePath) -}}
+          {{- $jpgIcon := resources.Get (printf "%s.jpg" $logoBasePath) -}}
+          {{- $icon := or (and $svgIcon $svgIcon.RelPermalink) (or (and $pngIcon $pngIcon.RelPermalink) (and $jpgIcon $jpgIcon.RelPermalink)) -}}
           <div class="d-flex justify-content-center align-items-center flex-column mb-2 ml-2" style="flex: 0 0 25%; margin-top:0.4rem">
             {{- with .company_url}}<a href="{{.}}" target="_blank" rel="noopener noreferrer">{{end -}}
             {{- if $icon}}
