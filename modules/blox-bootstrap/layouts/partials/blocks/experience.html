@@ -5,7 +5,7 @@
 {{/* Initialise */}}
 {{ $page := .wcPage }}
 {{ $block := .wcBlock }}
-{{ $columns := $block.design.columns | default "1" }}
+{{ $columns := $block.Params.design.columns | default "2" }}
 
 <!-- Experience widget -->
 <div class="col-12 {{if eq $columns "2"}}col-lg-8{{end}}">
@@ -13,8 +13,6 @@
 
   {{ if $block.content.items }}
   {{ $exp_len := len $block.content.items }}
-
-  {{/* Default to user's custom order (as requested in #1761) as Hugo doesn't support multiple sorts on params. */}}
   {{ range $idx, $key := $block.content.items }}
   <div class="row experience">
     <!-- Timeline -->
@@ -34,52 +32,45 @@
     <!-- Content -->
     <div class="col py-2">
       <div class="card">
-        <div class="card-body">
+        <div class="card-body d-flex align-items-start">
 
+          <!-- Logo Section -->
           {{- if .company_logo}}
           {{- $logoBasePath := printf "media/icons/brands/%s" .company_logo -}}
-          {{- $svgIcon := resources.Get (printf "%s.svg" $logoBasePath) -}}
-          {{- $pngIcon := resources.Get (printf "%s.png" $logoBasePath) -}}
-          {{- $jpgIcon := resources.Get (printf "%s.jpg" $logoBasePath) -}}
-          {{- $icon := or (and $svgIcon $svgIcon.RelPermalink) (or (and $pngIcon $pngIcon.RelPermalink) (and $jpgIcon $jpgIcon.RelPermalink)) -}}
-          <div class="d-flex align-content-start">
-            <div class="mr-2 mb-2">
-              {{- with .company_url}}<a href="{{.}}" target="_blank" rel="noopener">{{end -}}
-              {{- if $icon}}
-                <img src="{{ $icon }}" style="height: 56px; width: auto;" alt="{{ .company | plainify }}" loading="lazy">
-              {{- else}}
-                <img src="/path/to/default/logo.png" width="56" height="56" alt="Default Logo" loading="lazy">
-              {{- end}}
-              {{- with .company_url}}</a>{{end -}}
+          {{- $icon := resources.GetMatch (printf "%s.{svg,png,jpg}" $logoBasePath) | relURL -}}
+          <div class="d-flex justify-content-center align-items-center flex-column mb-2 ml-2" style="flex: 0 0 25%; margin-top:0.4rem">
+            {{- with .company_url}}<a href="{{.}}" target="_blank" rel="noopener noreferrer">{{end -}}
+            {{- if $icon}}
+              <img src="{{ $icon }}" style="height: 56px; width: auto;" alt="{{ .company | plainify }}" loading="lazy">
+            {{- else}}
+              <img src="/path/to/default/logo.png" width="56" height="56" alt="Default Logo" loading="lazy">
+            {{- end}}
+            {{- with .company_url}}</a>{{end -}}
+          </div>
+          {{ end }}
+
+          
+          <!-- Title and Meta Section -->
+          <div style="flex: 0 0 60%;">
+            <div class="section-subheading card-title exp-title text-muted my-0">{{.title | markdownify | emojify}}</div>
+            <div class="section-subheading card-title exp-company text-muted my-0">
+              {{- with .company_url}}<a href="{{.}}" target="_blank" rel="noopener noreferrer">{{end}}{{.company | markdownify | emojify}}{{with .company_url}}</a>{{end -}}
             </div>
-            <div>
-        {{ end }}
-       
-
-              <div class="section-subheading card-title exp-title text-muted my-0">{{.title | markdownify | emojify}}</div>
-              <div class="section-subheading card-title exp-company text-muted my-0">
-                {{- with .company_url}}<a href="{{.}}" target="_blank" rel="noopener">{{end}}{{.company | markdownify | emojify}}{{with .company_url}}</a>{{end -}}
-              </div>
-              <div class="text-muted exp-meta">
-                {{ (time .date_start) | time.Format ($block.Params.date_format | default "January 2006") }} –
-                {{ if .date_end}}
-                  {{ (time .date_end) | time.Format ($block.Params.date_format | default "January 2006") }}
-                {{else}}
-                  {{ i18n "present" | default "Present" }}
-                {{end}}
-                {{with .location}}
-                  <span class="middot-divider"></span>
-                  <span>{{.}}</span>
-                {{end}}
-              </div>
-
-          {{- if .company_logo}}
+            <div class="text-muted exp-meta">
+              {{ (time .date_start) | time.Format ($block.Params.date_format | default "January 2006") }} –
+              {{ if .date_end}}
+                {{ (time .date_end) | time.Format ($block.Params.date_format | default "January 2006") }}
+              {{else}}
+                {{ i18n "present" | default "Present" }}
+              {{end}}
+              {{with .location}}
+                <span class="middot-divider"></span>
+                <span>{{.}}</span>
+              {{end}}
             </div>
           </div>
-          {{end}}
-
-          {{with .description}}<div class="card-text">{{. | markdownify | emojify}}</div>{{end}}
         </div>
+        {{with .description}}<div class="card-text">{{. | markdownify | emojify}}</div>{{end}}
       </div>
     </div>
   </div>
