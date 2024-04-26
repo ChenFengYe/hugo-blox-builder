@@ -13,6 +13,8 @@
   {{ $author = $block.content.username }}
 {{end}}
 
+
+
 {{ $person_page_path := (printf "/authors/%s" $author) }}
 {{ $person_page := site.GetPage $person_page_path }}
 {{ if not $person_page }}
@@ -21,14 +23,15 @@
 {{ $person := $person_page.Params }}
 {{ $avatar := ($person_page.Resources.ByType "image").GetMatch "*avatar*" }}
 {{ $avatar_shape := site.Params.features.avatar.shape | default "circle" }}
+{{ $hide_num := $person_page.Params.others_hide }}
 
 <style>
   .others-list li, .news-list li {
       display: none;
   }
-  /* .news-list li:nth-child(-n+6), .others-list li:nth-child(-n+2) {
+  .news-list li:nth-child(-n+6), .others-list li:nth-child(-n+2) {
       display: list-item;
-  } */
+  }
   /* 按钮的基本样式 */
 .toggle-button {
     display: block; /* 将按钮显示为块级元素 */
