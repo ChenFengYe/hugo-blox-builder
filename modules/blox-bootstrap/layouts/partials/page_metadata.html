@@ -39,6 +39,15 @@
   </span>
   {{ end }}
 
+  {{ with $page.Params.location }}
+  <span class="middot-divider"></span>
+  {{ . | markdownify }}
+  {{ end }}
+
+  {{ with $page.Params.event }}
+  <span class="middot-divider"></span>
+  {{ . | markdownify }}
+  {{ end }}
 
   {{ if and (eq $page.Type "post") (not (or (eq site.Params.reading_time false) (eq $page.Params.reading_time false))) }}
   <span class="middot-divider"></span>
